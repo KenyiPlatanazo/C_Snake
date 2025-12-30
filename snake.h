@@ -1,8 +1,9 @@
 #ifndef SNAKE
 #define SNAKE
+#include "SDL2/SDL.h"
 #include "linked_list.h"
-#define ROW_COUNT 60
-#define COL_COUNT 60
+#define ROW_COUNT 23
+#define COL_COUNT 29
 #define TRUE 1
 #define FALSE 0
 enum CellType { EMPTY, FOOD, SNAKE_MODE };
