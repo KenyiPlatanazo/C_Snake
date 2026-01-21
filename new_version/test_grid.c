@@ -1,5 +1,6 @@
 #include "SDL2/SDL.h"
 #include "stdbool.h"
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 #include <stdlib.h>
 
@@ -9,12 +10,8 @@
 #define SCREEN_HEIGHT ((COL_COUNT * GRID_CELL_SIZE) + 1)
 #define ROW_COUNT 29
 #define COL_COUNT 23
-#define UP 1
-#define DOWN -1
-#define RIGHT 1
-#define LEFT -1
 
-enum Color { RED, GREEN, GREY };
+enum Color { RED, GREEN, WHITE };
 
 struct Cell {
   enum Color color;
@@ -40,7 +37,7 @@ bool sdl_initialize(struct Game *game);
 void game_cleanup(struct Game *game, int exit_status);
 void init_board(struct Game *game);
 void handle_movement_input(struct Game *game, SDL_Event event);
-void handle_inputs(struct Game *game, SDL_Event event);
+void handle_inputs(struct Game *game);
 
 int main() {
   struct Game game = {
@@ -54,29 +51,10 @@ int main() {
     printf("We fucked up >:c");
     exit(1);
   }
-  while (true) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
-        game_cleanup(&game, EXIT_SUCCESS);
-        break;
-      case SDL_KEYDOWN:
-        switch (event.key.keysym.scancode) {
-        case SDL_SCANCODE_ESCAPE:
-          game_cleanup(&game, EXIT_SUCCESS);
-          break;
-        case SDL_SCANCODE_SPACE:
-          SDL_SetRenderDrawColor(game.renderer, rand() % 256, rand() % 256,
-                                 rand() % 256, rand() % 256);
-          break;
-        default:
-          break;
-        }
-      default:
-        break;
-      }
-    }
+  while (!game.game_over) {
+    handle_inputs(&game);
+    draw_grid(&game);
+    SDL_Delay(16);
   }
   return 0;
 }
@@ -100,7 +78,6 @@ bool sdl_initialize(struct Game *game) {
     return true;
   }
   init_board(game);
-  draw_grid(game);
   return false;
 }
 
@@ -114,7 +91,7 @@ void game_cleanup(struct Game *game, int exit_status) {
 void init_board(struct Game *game) {
   for (int i = 0; i < ROW_COUNT; i++) {
     for (int j = 0; j < COL_COUNT; j++) {
-      game->board[i][j].cell.color = GREY;
+      game->board[i][j].cell.color = WHITE;
       game->board[i][j].cell.x = i;
       game->board[i][j].cell.y = j;
       game->board[i][j].rect.x = i * GRID_CELL_SIZE;
@@ -130,26 +107,36 @@ void init_board(struct Game *game) {
   // For the demonstration, the moving cell will always start in the middle of
   // the grid
   game->head = &game->board[ROW_COUNT / 2][COL_COUNT / 2].cell;
+  game->head->color = GREEN;
 }
 
 void draw_grid(struct Game *game) {
-  // SDL_Color red = {255, 0, 0, 255};
-  // SDL_Color green = {0, 255, 0, 255};
+  SDL_Color red = {255, 0, 0, 255};
+  SDL_Color green = {0, 255, 0, 255};
   SDL_Color white = {255, 255, 255, 255};
-  SDL_Color black = {0, 0, 0, 0};
-  SDL_Delay(16);
+  SDL_Color black = {0, 0, 0, 255};
+  SDL_RenderClear(game->renderer);
   for (int i = 0; i < ROW_COUNT; i++) {
     for (int j = 0; j < COL_COUNT; j++) {
       // Fills the cell with color
-      SDL_SetRenderDrawColor(game->renderer, white.r, white.g, white.b,
-                             white.a);
+      switch (game->board[i][j].cell.color) {
+      case RED:
+        SDL_SetRenderDrawColor(game->renderer, red.r, red.g, red.b, red.a);
+        break;
+      case GREEN:
+        SDL_SetRenderDrawColor(game->renderer, green.r, green.g, green.b,
+                               green.a);
+        break;
+      case WHITE:
+        SDL_SetRenderDrawColor(game->renderer, white.r, white.g, white.b,
+                               white.a);
+        break;
+      }
       SDL_RenderFillRect(game->renderer, &game->board[i][j].rect);
       // Adds a black frame to each cell of the grid
       SDL_SetRenderDrawColor(game->renderer, black.r, black.g, black.b,
                              black.a);
       SDL_RenderDrawRect(game->renderer, &game->board[i][j].rect);
-      SDL_RenderCopy(game->renderer, NULL, &game->board_frame,
-                     &game->board[i][j].rect);
     }
   }
   SDL_RenderPresent(game->renderer);
@@ -163,45 +150,60 @@ void handle_movement_input(struct Game *game, SDL_Event event) {
     break;
   case SDL_SCANCODE_W:
   case SDL_SCANCODE_UP:
-    if (game->head->y - 1 < 0)
-      game_cleanup(game, EXIT_FAILURE);
-    game->head->y = game->head->y - 1;
-    game->board[game->head->y][game->head->y].cell.color = GREEN;
+    if (game->head->y - 1 < 0) {
+      game->game_over = true;
+      game_cleanup(game, EXIT_SUCCESS);
+    }
+    game->head->color = WHITE;
+    game->head = &game->board[game->head->x][game->head->y - 1].cell;
+    game->head->color = GREEN;
     break;
   case SDL_SCANCODE_S:
   case SDL_SCANCODE_DOWN:
-    if (game->head->y + 1 >= COL_COUNT)
-      game_cleanup(game, EXIT_FAILURE);
-    game->head->y = game->head->y + 1;
-    game->board[game->head->y][game->head->y].cell.color = GREEN;
+    if (game->head->y + 1 >= COL_COUNT) {
+      game->game_over = true;
+      game_cleanup(game, EXIT_SUCCESS);
+    }
+    game->head->color = WHITE;
+    game->head = &game->board[game->head->x][game->head->y + 1].cell;
+    game->head->color = GREEN;
     break;
   case SDL_SCANCODE_A:
   case SDL_SCANCODE_LEFT:
-    if (game->head->x - 1 < 0)
-      game_cleanup(game, EXIT_FAILURE);
-    game->head->x = game->head->x - 1;
-    game->board[game->head->x][game->head->x].cell.color = GREEN;
+    if (game->head->x - 1 < 0) {
+      game->game_over = true;
+      game_cleanup(game, EXIT_SUCCESS);
+    }
+    game->head->color = WHITE;
+    game->head = &game->board[game->head->x - 1][game->head->y].cell;
+    game->head->color = GREEN;
     break;
   case SDL_SCANCODE_D:
   case SDL_SCANCODE_RIGHT:
-    if (game->head->y + 1 >= ROW_COUNT)
-      game_cleanup(game, EXIT_FAILURE);
-    game->head->x = game->head->x + 1;
-    game->board[game->head->x][game->head->x].cell.color = GREEN;
+    if (game->head->x + 1 >= ROW_COUNT) {
+      game->game_over = true;
+      game_cleanup(game, EXIT_SUCCESS);
+    }
+    game->head->color = WHITE;
+    game->head = &game->board[game->head->x + 1][game->head->y].cell;
+    game->head->color = GREEN;
     break;
   default:
     break;
   }
 }
-void handle_inputs(struct Game *game, SDL_Event event) {
-  switch (event.type) {
-  case SDL_QUIT:
-    game_cleanup(game, EXIT_SUCCESS);
-    break;
-  case SDL_KEYDOWN:
-    handle_movement_input(game, event);
-    break;
-  default:
-    break;
+void handle_inputs(struct Game *game) {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_QUIT:
+      game_cleanup(game, EXIT_SUCCESS);
+      break;
+    case SDL_KEYDOWN:
+      handle_movement_input(game, event);
+      break;
+    default:
+      break;
+    }
   }
 }
