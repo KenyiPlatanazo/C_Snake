@@ -41,6 +41,8 @@ void game_cleanup(struct Game *game, int exit_status);
 void init_board(struct Game *game);
 void handle_movement_input(struct Game *game, SDL_Event event);
 void handle_inputs(struct Game *game, SDL_Event event);
+void check_crash(struct Game *game);
+void move_head(struct Game *game, int movement);
 
 int main() {
   struct Game game = {
@@ -155,7 +157,6 @@ void draw_grid(struct Game *game) {
   SDL_RenderPresent(game->renderer);
 }
 
-// TODO: Refactor this shit
 void handle_movement_input(struct Game *game, SDL_Event event) {
   switch (event.key.keysym.scancode) {
   case SDL_SCANCODE_ESCAPE:
@@ -205,3 +206,26 @@ void handle_inputs(struct Game *game, SDL_Event event) {
     break;
   }
 }
+void check_crash(struct Game *game) {
+
+  int movement = 1;
+  switch (movement) {
+  case DOWN:
+    movement = movement * -1;
+  case UP:
+    if (game->head->y + movement >= COL_COUNT || game->head->y + movement < 0) {
+      game_cleanup(game, EXIT_FAILURE);
+    }
+    move_head(game, movement);
+    break;
+  case LEFT:
+    movement = movement * -1;
+  case RIGHT:
+    if (game->head->x + movement >= ROW_COUNT || game->head->x + movement < 0)
+      game_cleanup(game, EXIT_FAILURE);
+    move_head(game, movement);
+  default:
+    break;
+  }
+}
+void move_head(struct Game *game, int movement) {}
