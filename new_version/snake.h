@@ -1,9 +1,9 @@
 #ifndef SNAKE
 #define SNAKE
-#define ROW_COUNT 23
-#define COL_COUNT 29
-#define STARTING_ROW 13
-#define STARTING_COL 15
+#define ROW_COUNT 29
+#define COL_COUNT 23
+#define STARTING_ROW (ROW_COUNT / 2)
+#define STARTING_COL (COL_COUNT / 2)
 
 enum cell_type { BOARD, FOOD, SNAKE_PART };
 struct Cell {
@@ -12,7 +12,7 @@ struct Cell {
 };
 
 struct Node {
-  struct Cell cell;
+  struct Cell *cell;
   struct Node *next;
   struct Node *previous;
 };
@@ -22,7 +22,6 @@ struct Linked_list {
   struct Node *last;
 };
 
-struct Cell *init_food(void);
 void new_node(struct Linked_list *list, struct Cell data);
 struct Linked_list *init_snake(void);
 void init_linked_list(struct Linked_list *list);

@@ -27,7 +27,6 @@ struct Game {
   SDL_Window *window;
   SDL_Renderer *renderer;
   struct Tile board[ROW_COUNT][COL_COUNT];
-  SDL_Rect board_frame;
   struct Cell *head;
   bool game_over;
 };
@@ -100,10 +99,6 @@ void init_board(struct Game *game) {
       game->board[i][j].rect.h = GRID_CELL_SIZE;
     }
   }
-  game->board_frame.x = 0;
-  game->board_frame.y = 0;
-  game->board_frame.w = SCREEN_HEIGHT;
-  game->board_frame.h = SCREEN_HEIGHT;
   // For the demonstration, the moving cell will always start in the middle of
   // the grid
   game->head = &game->board[ROW_COUNT / 2][COL_COUNT / 2].cell;

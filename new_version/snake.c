@@ -12,7 +12,7 @@ void new_node(struct Linked_list *list, struct Cell data) {
   struct Node *new_node = malloc(sizeof *new_node);
   if (!new_node)
     return;
-  new_node->cell = data;
+  new_node->cell = &data;
   new_node->next = NULL;
   new_node->previous = NULL;
 
@@ -39,17 +39,6 @@ struct Linked_list *init_snake(void) {
 }
 void grow(struct Linked_list *snake) {
   struct Cell new_cell = {
-      .type = SNAKE_PART, .x = snake->last->cell.x, .y = snake->last->cell.y};
+      .type = SNAKE_PART, .x = snake->last->cell->x, .y = snake->last->cell->y};
   new_node(snake, new_cell);
-}
-
-struct Cell *init_food(void) {
-  srand(time(NULL));
-  struct Cell *new_food = malloc(sizeof *new_food);
-  if (!new_food)
-    return NULL;
-  new_food->type = FOOD;
-  new_food->x = rand() % ROW_COUNT;
-  new_food->y = rand() % COL_COUNT;
-  return new_food;
 }

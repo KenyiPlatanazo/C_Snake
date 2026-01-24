@@ -16,15 +16,16 @@ struct Tile {
 struct Game {
   SDL_Window *window;
   SDL_Renderer *renderer;
-  struct Linked_list snake;
+  struct Linked_list *snake;
   struct Tile board[ROW_COUNT][COL_COUNT];
   bool game_over;
 };
 
-void update(struct Game *game);
 bool sdl_initialize(struct Game *game);
 void game_cleanup(struct Game *game, int exit_status);
 void draw_grid(struct Game *game);
 void move(struct Game *game, SDL_Event event);
 void handle_inputs(struct Game *game, SDL_Event event);
 void init_board(struct Game *game);
+void create_food(struct Game *game);
+void update_snake(struct Node *node, struct Cell *previous_cell);
