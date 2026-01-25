@@ -22,8 +22,7 @@ struct Linked_list {
   struct Node *last;
 };
 
-void new_node(struct Linked_list *list, struct Cell data);
-struct Linked_list *init_snake(void);
+void new_node(struct Linked_list *list, struct Cell *data);
 void init_linked_list(struct Linked_list *list);
 void grow(struct Linked_list *snake);
 #endif // !LINKED_LIST
