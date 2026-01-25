@@ -164,11 +164,20 @@ void move(struct Game *game, SDL_Event event) {
     game->game_over = true;
     return;
   }
-
   struct Cell *next = &game->board[new_x][new_y].cell;
-  current->type = BOARD;
+  if (next->type == SNAKE_PART) {
+    game->game_over = true;
+    return;
+  }
+
+  bool ate_fruit = (next->type == FOOD);
+  new_node(game->snake, next);
   next->type = SNAKE_PART;
-  head->cell = next;
+  if (!ate_fruit) {
+    delete_tail(game->snake);
+  } else {
+    create_food(game);
+  }
 }
 
 void create_food(struct Game *game) {

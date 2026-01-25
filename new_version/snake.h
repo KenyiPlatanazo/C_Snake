@@ -25,4 +25,5 @@ struct Linked_list {
 void new_node(struct Linked_list *snake, struct Cell *cell);
 void init_linked_list(struct Linked_list *list);
 void grow(struct Linked_list *snake);
+void delete_tail(struct Linked_list *snake);
 #endif // !LINKED_LIST

@@ -25,10 +25,11 @@ void init_linked_list(struct Linked_list *list) {
   list->last = NULL;
 }
 
-/*
-void grow(struct Linked_list *snake) {
-  struct Cell new_cell = {
-      .type = SNAKE_PART, .x = snake->last->cell->x, .y = snake->last->cell->y};
-  new_node(snake, new_cell);
+void delete_tail(struct Linked_list *snake) {
+  assert(snake->last);
+  struct Node *tail = snake->last;
+  tail->cell->type = BOARD;
+  snake->last = tail->previous;
+  snake->last->next = NULL;
+  free(tail);
 }
-*/
