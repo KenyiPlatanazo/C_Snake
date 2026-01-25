@@ -6,19 +6,19 @@
 #include "stdlib.h"
 #include "time.h"
 
-void new_node(struct Linked_list *list, struct Cell *data) {
+void new_node(struct Linked_list *snake, struct Cell *cell) {
   struct Node *new_node = malloc(sizeof *new_node);
   assert(new_node);
-  new_node->cell = data;
-  new_node->next = NULL;
-  new_node->previous = list->last;
+  new_node->cell = cell;
+  new_node->next = snake->head;
+  new_node->previous = NULL;
 
-  if (list->last) {
-    list->last->next = new_node;
+  if (snake->head) {
+    snake->head->previous = new_node;
   } else {
-    list->head = new_node;
+    snake->last = new_node;
   }
-  list->last = new_node;
+  snake->head = new_node;
 }
 void init_linked_list(struct Linked_list *list) {
   list->head = NULL;
