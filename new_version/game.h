@@ -25,7 +25,7 @@ struct Game {
 bool sdl_initialize(struct Game *game);
 void game_cleanup(struct Game *game, int exit_status);
 void draw_grid(struct Game *game);
-void move(struct Game *game, SDL_Event event);
+void change_direction(struct Game *game, SDL_Event event);
 void handle_inputs(struct Game *game);
 void init_board(struct Game *game);
 void create_food(struct Game *game);

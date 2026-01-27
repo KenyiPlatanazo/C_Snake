@@ -6,6 +6,7 @@
 #define STARTING_COL (COL_COUNT / 2)
 
 enum cell_type { BOARD, FOOD, SNAKE_PART };
+enum Direction { UP, DOWN, LEFT, RIGH };
 struct Cell {
   int x, y;
   enum cell_type type;
@@ -20,6 +21,9 @@ struct Node {
 struct Linked_list {
   struct Node *head;
   struct Node *last;
+  enum Direction direction;
+  // Adding this to prevent 180° turns which instakill the player
+  enum Direction next_direction;
 };
 
 void new_node(struct Linked_list *snake, struct Cell *cell);

@@ -120,7 +120,7 @@ void handle_inputs(struct Game *game) {
       game_cleanup(game, EXIT_SUCCESS);
       break;
     case SDL_KEYDOWN:
-      move(game, event);
+      change_direction(game, event);
       break;
     default:
       break;
@@ -128,7 +128,7 @@ void handle_inputs(struct Game *game) {
   }
 }
 
-void move(struct Game *game, SDL_Event event) {
+void change_direction(struct Game *game, SDL_Event event) {
   struct Node *head = game->snake->head;
   struct Cell *current = head->cell;
 
